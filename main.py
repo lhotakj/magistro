@@ -54,6 +54,7 @@ def teacher():
     print_log(f"Welcome {os.getenv('USER', '')}, get ready for solving {TOTAL_PROBLEMS} math "
               f"problems using {', '.join(OPERATIONS)}. Good luck ")
     print_log("Started at " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print_log("---------------------------")
     start = time.time()
     failed = 0
     attempts = 0
