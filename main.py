@@ -1,4 +1,5 @@
-# Simple
+#!/usr/bin/python3
+
 import random
 import os
 import time
@@ -14,6 +15,18 @@ def play_success():
     mixer.music.play()
 
 
+def play_intro():
+    mixer.init()
+    mixer.music.load('./sounds/intro.mp3')
+    mixer.music.play()
+
+
+def play_outro():
+    mixer.init()
+    mixer.music.load('./sounds/outro.mp3')
+    mixer.music.play()
+
+
 def play_fail():
     mixer.init()
     mixer.music.load('./sounds/fail.mp3')
@@ -21,19 +34,35 @@ def play_fail():
 
 
 def addition() -> tuple[str, str]:
-    addend1: int = random.randrange(ADDSUB_MIN_NUMBER, ADDSUB_MAX_NUMBER)
-    result: int = random.randrange(addend1, ADDSUB_MAX_RESULT)
+    addend1: int = random.randrange(ADD_SUB_MIN_NUMBER, ADD_SUB_MAX_NUMBER)
+    result: int = random.randrange(addend1, ADD_SUB_MAX_RESULT)
     addend2 = result - addend1
     problem_text: str = f"{addend1} + {addend2} = "
     return str(result), problem_text
 
 
 def subtraction() -> tuple[str, str]:
-    addend1: int = random.randrange(ADDSUB_MIN_NUMBER, ADDSUB_MAX_NUMBER)
-    result: int = random.randrange(addend1, ADDSUB_MAX_RESULT)
+    addend1: int = random.randrange(ADD_SUB_MIN_NUMBER, ADD_SUB_MAX_NUMBER)
+    result: int = random.randrange(addend1, ADD_SUB_MAX_RESULT)
     addend2 = result - addend1
     problem_text: str = f"{result} - {addend1} = "
     return str(addend2), problem_text
+
+
+def multiplication() -> tuple[str, str]:
+    multiplier1: int = random.randrange(MUL_DIV_MIN_NUMBER, MUL_DIV_MAX_NUMBER)
+    multiplier2: int = random.randrange(MUL_DIV_MIN_NUMBER, MUL_DIV_MAX_NUMBER)
+    result: int = multiplier1 * multiplier2
+    problem_text: str = f"{multiplier1} * {multiplier2} = "
+    return str(result), problem_text
+
+
+def division() -> tuple[str, str]:
+    multiplier1: int = random.randrange(MUL_DIV_MIN_NUMBER, MUL_DIV_MAX_NUMBER)
+    multiplier2: int = random.randrange(MUL_DIV_MIN_NUMBER, MUL_DIV_MAX_NUMBER)
+    result: int = multiplier1 * multiplier2
+    problem_text: str = f"{result} / {multiplier2} = "
+    return str(multiplier1), problem_text
 
 
 def format_time_elapsed(dif: float) -> str:
@@ -50,6 +79,7 @@ def print_log(text: str, new_line: bool = True, std_out: bool = True):
 
 
 def teacher():
+    play_intro()
     print_log("===========================")
     print_log(f"Welcome {os.getenv('USER', '')}, get ready for solving {TOTAL_PROBLEMS} math "
               f"problems using {', '.join(OPERATIONS)}. Good luck ")
@@ -75,6 +105,8 @@ def teacher():
 
     end = time.time()
 
+    play_outro()
+
     print_log("---------------------------")
     print_log(f"Total elapsed time (hh:mm:ss.ff) {format(format_time_elapsed(end - start))}")
     print_log(
@@ -85,11 +117,13 @@ def teacher():
     print_log("===========================")
 
 
-TOTAL_PROBLEMS: int = 2
-OPERATIONS: list = ['addition', 'subtraction']
-ADDSUB_MAX_RESULT: int = 100
-ADDSUB_MIN_NUMBER: int = 30
-ADDSUB_MAX_NUMBER: int = 90
+TOTAL_PROBLEMS: int = 15
+OPERATIONS: list = ['addition', 'subtraction', 'multiplication', 'division']
+ADD_SUB_MAX_RESULT: int = 100
+ADD_SUB_MIN_NUMBER: int = 30
+ADD_SUB_MAX_NUMBER: int = 90
+MUL_DIV_MIN_NUMBER: int = 2
+MUL_DIV_MAX_NUMBER: int = 10
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
