@@ -147,7 +147,7 @@ def teacher():
     print_log("===========================")
 
 
-TOTAL_PROBLEMS: int = 2
+TOTAL_PROBLEMS: int = 15
 # OPERATIONS: list = ['addition', 'subtraction', 'multiplication', 'division']
 OPERATIONS: list = ['time1']
 ADD_SUB_MAX_RESULT: int = 100
