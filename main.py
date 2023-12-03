@@ -11,20 +11,82 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer
 
 TIME1_QUESTIONS: list = [
+    {"How many days are a week?": "7"},
+    {"How many days are a working week?": "5"},
     {"How many hours are in a day?": "24"},
     {"How many hours are in two days?": "48"},
+    {"How many hours are in 2 days?": "48"},
     {"How many days are in a week?": "7"},
-    {"How many days are in a two weeks?": "14"},
-    {"How many days are in a three weeks?": "21"},
-    {"How many days are in a four weeks?": "28"},
+    {"How many days are in two weeks?": "14"},
+    {"How many days are in 2 weeks?": "14"},
+    {"How many days are in two weeks?": "14"},
+    {"How many days are in 2 weeks?": "14"},
+    {"How many days are in three weeks?": "21"},
+    {"How many days are in 3 weeks?": "21"},
+    {"How many days are in four weeks?": "28"},
+    {"How many days are in 4 weeks?": "28"},
     {"How many weeks are in a month?": "4"},
     {"How many months are in a year?": "12"},
-    {"How many days are in a leap year?": "366"},
-    {"How many days are in a normal year?": "365"},
-    {"What is the name of the shortest month of the year?": ["feb", "february"]},
     {"How many hours are in half a day?": "12"},
     {"How many minutes are in an hour?": "60"},
     {"How many seconds are in a minute?": "60"},
+]
+
+TIME2_QUESTIONS: list = [
+    {"How many meteorological seasons are in a year?": ["four", "4"]},
+    {"When starts the meteorological spring in the Northern Hemisphere (Europe)?": ["mar 1st", "mar 1", "1st mar",
+                                                                                    "1 mar", "march 1st", "march 1",
+                                                                                    "1st march", "1 march", "1.3",
+                                                                                    "1.3.", "3/1"]},
+    {"When starts the meteorological summer in the Northern Hemisphere (Europe)?": ["jun 1st", "jun 1", "1st jun",
+                                                                                    "1 jun", "june 1st", "june 1",
+                                                                                    "1st june", "1 june", "1.6", "1.6.",
+                                                                                    "6/1"]},
+    {"When starts the meteorological autumn in the Northern Hemisphere (Europe)?": ["sep 1st", "sep 1", "1st sep",
+                                                                                    "1 sep", "september 1st",
+                                                                                    "september 1", "1st september",
+                                                                                    "1 september", "1.9", "1.9.",
+                                                                                    "9/1"]},
+    {"When starts the meteorological winter in the Northern Hemisphere (Europe)?": ["dec 1st", "dec 1", "1st dec",
+                                                                                    "1 dec", "december 1st",
+                                                                                    "december 1", "1st december",
+                                                                                    "1 december", "1.12", "1.12.",
+                                                                                    "12/1"]},
+
+    {"When starts the meteorological autumn in the Southern Hemisphere (Australia)?": ["mar 1st", "mar 1", "1st mar",
+                                                                                       "1 mar", "march 1st", "march 1",
+                                                                                       "1st march", "1 march", "1.3",
+                                                                                       "1.3.", "3/1"]},
+    {"When starts the meteorological winter in the Southern Hemisphere (Australia)?": ["jun 1st", "jun 1", "1st jun",
+                                                                                       "1 jun", "june 1st", "june 1",
+                                                                                       "1st june", "1 june", "1.6",
+                                                                                       "1.6.", "6/1"]},
+    {"When starts the meteorological spring in the Southern Hemisphere (Australia)?": ["sep 1st", "sep 1", "1st sep",
+                                                                                       "1 sep", "september 1st",
+                                                                                       "september 1", "1st september",
+                                                                                       "1 september", "1.9", "1.9.",
+                                                                                       "9/1"]},
+    {"When starts the meteorological summer in the Southern Hemisphere (Australia)?": ["dec 1st", "dec 1", "1st dec",
+                                                                                       "1 dec", "december 1st",
+                                                                                       "december 1", "1st december",
+                                                                                       "1 december", "1.12", "1.12.",
+                                                                                       "12/1"]},
+
+    {"What season is in Europe when in Australia is spring?": ["autumn", "fall"]},
+    {"What season is in Europe when in Australia is summer?": "winter"},
+    {"What season is in Europe when in Australia is autumn?": "spring"},
+    {"What season is in Europe when in Australia is winter?": "summer"},
+    {"What season is in Australia when in Europe is spring?": ["autumn", "fall"]},
+    {"What season is in Australia when in Europe is summer?": "winter"},
+    {"What season is in Australia when in Europe is autumn?": "spring"},
+    {"What season is in Australia when in Europe is winter?": "summer"},
+    {"How many days are in a leap year?": "366"},
+    {"How many days are in a normal year?": "365"},
+    {"What is the name of the shortest month of the leap year?": ["feb", "february"]},
+    {"How many days has February in the leap year?": "29"},
+    {"How ofter is a leap year?": ["in 4 years", "every 4 years", "4", "4 years", "4 yrs"]},
+    {"What is the last month in the year?": ["dec", "December"]},
+    {"What is the first month in the year?": ["jan", "january"]},
 ]
 
 
@@ -39,13 +101,21 @@ def play(sound: str) -> None:
     mixer.music.play()
 
 
-def time1() -> tuple[list[str], str]:
-    problems: list = TIME1_QUESTIONS
+def verbal_question(dictionary_name: list) -> tuple[list[str], str]:
+    problems: list = dictionary_name
     problem: dict = problems[random.randrange(0, len(problems) - 1)]
     question: str = list(problem.keys())[0] + " "
     answers: str | list = list(problem.values())[0]
     answers = answers if isinstance(answers, list) else [answers]
     return answers, question
+
+
+def time1() -> tuple[list[str], str]:
+    return verbal_question(TIME1_QUESTIONS)
+
+
+def time2() -> tuple[list[str], str]:
+    return verbal_question(TIME2_QUESTIONS)
 
 
 def addition() -> tuple[str, str]:
@@ -98,7 +168,7 @@ def teacher():
     play("intro")
     print_log("===========================")
     print_log(f"Welcome {os.getenv('USER', '')}, get ready for solving {Fore.GREEN}{TOTAL_PROBLEMS}{Style.RESET_ALL} "
-              f"problems using {', '.join(OPERATIONS)}. Good luck!")
+              f"tasks using {', '.join(OPERATIONS)}. Good luck!")
     print_log("Started at " + Fore.GREEN + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + Style.RESET_ALL)
     print_log("---------------------------")
     start = time.time()
@@ -106,7 +176,7 @@ def teacher():
     attempts = 0
     play("start")
     for x in range(0, TOTAL_PROBLEMS):
-        if x == TOTAL_PROBLEMS:
+        if x == TOTAL_PROBLEMS - 1:
             play("final")
         result, problem_text = eval(random.choice(OPERATIONS) + "()")
         ok: bool = False
@@ -134,7 +204,6 @@ def teacher():
                     break
 
     end = time.time()
-
     play("outro")
 
     print_log("---------------------------")
@@ -145,11 +214,12 @@ def teacher():
     print_log(f"Total failed attempts {failed}")
     print_log(f"Success rate {round(TOTAL_PROBLEMS / attempts, 4) * 100}%")
     print_log("===========================")
+    input("Press any key to close the window ...")
 
 
-TOTAL_PROBLEMS: int = 15
+TOTAL_PROBLEMS: int = 2
 # OPERATIONS: list = ['addition', 'subtraction', 'multiplication', 'division']
-OPERATIONS: list = ['time1']
+OPERATIONS: list = ['time1', 'time2']
 ADD_SUB_MAX_RESULT: int = 100
 ADD_SUB_MIN_NUMBER: int = 30
 ADD_SUB_MAX_NUMBER: int = 90
