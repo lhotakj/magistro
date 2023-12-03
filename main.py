@@ -167,6 +167,7 @@ def teacher():
     print(Style.RESET_ALL)
     play("intro")
     print_log("===========================")
+    print_log("===========================")
     print_log(f"Welcome {os.getenv('USER', '')}, get ready for solving {Fore.GREEN}{TOTAL_PROBLEMS}{Style.RESET_ALL} "
               f"tasks using {', '.join(OPERATIONS)}. Good luck!")
     print_log("Started at " + Fore.GREEN + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + Style.RESET_ALL)

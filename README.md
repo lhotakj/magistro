@@ -1,4 +1,4 @@
-# math-trainer
+# Magistro
 Simple Python application for testing kids in the following areas:
 * math - subtraction
 * math - addition
