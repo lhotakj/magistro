@@ -6,9 +6,12 @@ import time
 import datetime
 import re
 from colorama import Fore, Style
+from slack_sdk import WebClient
 
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer
+
+SEND_SLACK: bool = True
 
 TIME1_QUESTIONS: list = [
     {"How many days are a week?": "7"},
@@ -101,6 +104,33 @@ def play(sound: str) -> None:
     mixer.music.play()
 
 
+def send_message(intro: str, text: str):
+    if SEND_SLACK:
+        print_log(text="Sending Slack notification", new_line=True, std_out=True)
+        if "SLACK_BOT_TOKEN" not in os.environ:
+            print("Environment variable SLACK_BOT_TOKEN not provided. Slack notification skipped")
+            return None
+        if "SLACK_CHANNEL_ID" not in os.environ:
+            print("Environment variable SLACK_CHANNEL_ID not provided. Slack notification skipped")
+            return None
+
+        client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+
+        # Specify the channel ID and the message text
+        channel_id = os.environ.get("SLACK_CHANNEL_ID")
+
+        # Send the message to the channel
+        result = None
+        try:
+            result = client.chat_postMessage(channel=channel_id, text='.', mrkdwn=True, blocks=[
+                {"type": "section", "text": {"type": "plain_text", "text": intro}},
+                {"type": "section", "text": {"type": "mrkdwn", "text": text}}
+            ])
+        except:
+            print_log(text="Error while sending Slack", new_line=True, std_out=True)
+            print_log(text=str(result), new_line=True, std_out=True)
+
+
 def verbal_question(dictionary_name: list) -> tuple[list[str], str]:
     problems: list = dictionary_name
     problem: dict = problems[random.randrange(0, len(problems) - 1)]
@@ -164,14 +194,28 @@ def print_log(text: str, new_line: bool = True, std_out: bool = True):
 
 
 def teacher():
+    slack_report: str = ""
+    user: str = os.getenv('USER', '')
+    if user == '':
+        user = os.getenv('USERNAME', '')
+    if user == '':
+        user = "<unknown user>"
     print(Style.RESET_ALL)
     play("intro")
-    print_log("===========================")
-    print_log("===========================")
-    print_log(f"Welcome {os.getenv('USER', '')}, get ready for solving {Fore.GREEN}{TOTAL_PROBLEMS}{Style.RESET_ALL} "
+    print("                       _     _             ")
+    print("                      (_)   | |            ")
+    print(" _ __ ___   __ _  __ _ _ ___| |_ _ __ ___  ")
+    print("| '_ ` _ \ / _` |/ _` | / __| __| '__/ _ \ ")
+    print("| | | | | | (_| | (_| | \__ \ |_| | | (_) |")
+    print("|_| |_| |_|\__,_|\__, |_|___/\__|_|  \___/ ")
+    print("                  __/ |                    ")
+    print("                 |___/  version 1.2.       ")
+    print_log("===========================================")
+    print_log("===========================================")
+    print_log(f"Welcome {user}, get ready for solving {Fore.GREEN}{TOTAL_PROBLEMS}{Style.RESET_ALL} "
               f"tasks using {', '.join(OPERATIONS)}. Good luck!")
     print_log("Started at " + Fore.GREEN + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + Style.RESET_ALL)
-    print_log("---------------------------")
+    print_log("-------------------------------------------")
     start = time.time()
     failed = 0
     attempts = 0
@@ -181,9 +225,10 @@ def teacher():
             play("final")
         result, problem_text = eval(random.choice(OPERATIONS) + "()")
         ok: bool = False
+        problem_text_raw: str = problem_text
         problem_text = ("#" + str(x + 1) + "/" + str(TOTAL_PROBLEMS) + ": ").ljust(
             8) + Fore.LIGHTWHITE_EX + problem_text + Style.RESET_ALL
-
+        errors: int = 0
         while not ok:
             attempts += 1
             print_log(text=problem_text, new_line=False, std_out=False)
@@ -192,6 +237,7 @@ def teacher():
             if isinstance(result, list):
                 if user_input not in result:
                     failed += 1
+                    errors += 1
                     play("fail")
                 else:
                     play("success")
@@ -199,28 +245,48 @@ def teacher():
             else:
                 if user_input != result:
                     failed += 1
+                    errors += 1
                     play("fail")
                 else:
                     play("success")
                     break
 
+        slack_report += ("#" + (str(x + 1) + ": ").ljust(4)) + problem_text_raw + user_input + " "
+        if errors == 0:
+            slack_report += "✅"
+        else:
+            slack_report += "❌ " + str(errors) + " attempts"
+        slack_report += "\n"
+
     end = time.time()
     play("outro")
 
-    print_log("---------------------------")
+    print_log("-------------------------------------------")
+    print_log(f"Total number of problems {TOTAL_PROBLEMS}")
     print_log(f"Total elapsed time (hh:mm:ss.ff) {format(format_time_elapsed(end - start))}")
     print_log(
-        f"Total time per single problem (hh:mm:ss.ff) {format(format_time_elapsed(float(end - start) / TOTAL_PROBLEMS))}")
-    print_log(f"Total number of problems {TOTAL_PROBLEMS}")
+        f"Total time per single question (hh:mm:ss.ff) "
+        f"{format(format_time_elapsed(float(end - start) / TOTAL_PROBLEMS))}")
     print_log(f"Total failed attempts {failed}")
     print_log(f"Success rate {round(TOTAL_PROBLEMS / attempts, 4) * 100}%")
-    print_log("===========================")
+    print_log("===========================================")
+    slack_report += f"------------------------------------------\n"
+    slack_report += f"Selected topics: {', '.join(OPERATIONS)}\n"
+    slack_report += f"Total number of problems: {TOTAL_PROBLEMS}\n"
+    slack_report += f"Total time per single question: {format(format_time_elapsed(float(end - start) / TOTAL_PROBLEMS))}\n"
+    slack_report += f"Total failed attempts: {failed}\n"
+
+    if SEND_SLACK:
+        send_message(
+            intro=f"User *{user}* just finished magistro tasks with the following results",
+            text="```" + slack_report + "```")
     input("Press any key to close the window ...")
 
 
 TOTAL_PROBLEMS: int = 2
 # OPERATIONS: list = ['addition', 'subtraction', 'multiplication', 'division']
-OPERATIONS: list = ['time1', 'time2']
+# OPERATIONS: list = ['time1', 'time2']
+OPERATIONS: list = ['addition']
 ADD_SUB_MAX_RESULT: int = 100
 ADD_SUB_MIN_NUMBER: int = 30
 ADD_SUB_MAX_NUMBER: int = 90
