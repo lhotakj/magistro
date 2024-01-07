@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 import random
 import os
 import time
@@ -7,7 +6,7 @@ import datetime
 import re
 from colorama import Fore, Style
 from slack_sdk import WebClient
-
+from slack_sdk.errors import SlackApiError
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer
 
@@ -94,7 +93,7 @@ TIME2_QUESTIONS: list = [
 
 
 def escape_ansi(line):
-    ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
+    ansi_escape = re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]")
     return ansi_escape.sub('', line)
 
 
@@ -126,8 +125,8 @@ def send_message(intro: str, text: str):
                 {"type": "section", "text": {"type": "plain_text", "text": intro}},
                 {"type": "section", "text": {"type": "mrkdwn", "text": text}}
             ])
-        except:
-            print_log(text="Error while sending Slack", new_line=True, std_out=True)
+        except SlackApiError as e:
+            print_log(text=f"Error while sending Slack. {e}", new_line=True, std_out=True)
             print_log(text=str(result), new_line=True, std_out=True)
 
 
@@ -176,7 +175,7 @@ def division() -> tuple[str, str]:
     multiplier1: int = random.randrange(MUL_DIV_MIN_NUMBER, MUL_DIV_MAX_NUMBER)
     multiplier2: int = random.randrange(MUL_DIV_MIN_NUMBER, MUL_DIV_MAX_NUMBER)
     result: int = multiplier1 * multiplier2
-    problem_text: str = f"{result} / {multiplier2} = "
+    problem_text: str = f"{result} : {multiplier2} = "
     return str(multiplier1), problem_text
 
 
@@ -202,23 +201,24 @@ def teacher():
         user = "<unknown user>"
     print(Style.RESET_ALL)
     play("intro")
-    print("                       _     _             ")
-    print("                      (_)   | |            ")
-    print(" _ __ ___   __ _  __ _ _ ___| |_ _ __ ___  ")
-    print("| '_ ` _ \ / _` |/ _` | / __| __| '__/ _ \ ")
-    print("| | | | | | (_| | (_| | \__ \ |_| | | (_) |")
-    print("|_| |_| |_|\__,_|\__, |_|___/\__|_|  \___/ ")
-    print("                  __/ |                    ")
-    print("                 |___/  version 1.2.       ")
+    print(r"                       _     _             ")
+    print(r"                      (_)   | |            ")
+    print(r" _ __ ___   __ _  __ _ _ ___| |_ _ __ ___  ")
+    print(r"| '_ ` _ \ / _` |/ _` | / __| __| '__/ _ \ ")
+    print(r"| | | | | | (_| | (_| | \__ \ |_| | | (_) |")
+    print(r"|_| |_| |_|\__,_|\__, |_|___/\__|_|  \___/ ")
+    print(r"                  __/ |                    ")
+    print(r"                 |___/  version 1.3.       ")
     print_log("===========================================")
     print_log("===========================================")
     print_log(f"Welcome {user}, get ready for solving {Fore.GREEN}{TOTAL_PROBLEMS}{Style.RESET_ALL} "
               f"tasks using {', '.join(OPERATIONS)}. Good luck!")
     print_log("Started at " + Fore.GREEN + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + Style.RESET_ALL)
     print_log("-------------------------------------------")
-    start = time.time()
-    failed = 0
-    attempts = 0
+    start: float = time.time()
+    failed: int = 0
+    attempts: int = 0
+    user_input: str = ""
     play("start")
     for x in range(0, TOTAL_PROBLEMS):
         if x == TOTAL_PROBLEMS - 1:
@@ -273,7 +273,8 @@ def teacher():
     slack_report += f"------------------------------------------\n"
     slack_report += f"Selected topics: {', '.join(OPERATIONS)}\n"
     slack_report += f"Total number of problems: {TOTAL_PROBLEMS}\n"
-    slack_report += f"Total time per single question: {format(format_time_elapsed(float(end - start) / TOTAL_PROBLEMS))}\n"
+    slack_report += f"Total time per single question: " \
+                    f"{format(format_time_elapsed(float(end - start) / TOTAL_PROBLEMS))}\n"
     slack_report += f"Total failed attempts: {failed}\n"
 
     if SEND_SLACK:
@@ -283,10 +284,10 @@ def teacher():
     input("Press any key to close the window ...")
 
 
-TOTAL_PROBLEMS: int = 2
+TOTAL_PROBLEMS: int = 25
 # OPERATIONS: list = ['addition', 'subtraction', 'multiplication', 'division']
 # OPERATIONS: list = ['time1', 'time2']
-OPERATIONS: list = ['addition']
+OPERATIONS: list = ['multiplication', 'division']
 ADD_SUB_MAX_RESULT: int = 100
 ADD_SUB_MIN_NUMBER: int = 30
 ADD_SUB_MAX_NUMBER: int = 90
