@@ -1,0 +1,16 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+    - uses: Silleellie/pylint-github-action@v1
+      with:
+        package-path: .
+        python-version: ${{ matrix.python-version }}
+        requirements-path: requirements/requirements-dev.txt

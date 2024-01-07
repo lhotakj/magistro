@@ -8,7 +8,7 @@ from colorama import Fore, Style
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-from pygame import mixer
+from pygame import mixer  # nopep8
 
 SEND_SLACK: bool = True
 
@@ -92,6 +92,7 @@ TIME2_QUESTIONS: list = [
 ]
 
 
+# noinspection RegExpRedundantEscape
 def escape_ansi(line):
     ansi_escape = re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]")
     return ansi_escape.sub('', line)
