@@ -1,4 +1,4 @@
-name: Pylint
+name: Pylint badge
 
 on: [push]
 
@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: "3.10"
     steps:
     - uses: Silleellie/pylint-github-action@v1
       with:
         package-path: .
         python-version: ${{ matrix.python-version }}
-        requirements-path: requirements/requirements-dev.txt
+        requirements-path: requirements.txt
